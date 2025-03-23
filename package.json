@@ -1,0 +1,35 @@
+{
+  "name": "indie-project-starter",
+  "version": "1.0.0",
+  "description": "Monorepo template for indie hackers with NestJS backend and Vue3 frontend",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "dev:backend": "pnpm run --filter @indie-project/backend dev",
+    "dev:frontend": "pnpm run --filter @indie-project/frontend dev",
+    "build": "pnpm run --parallel build",
+    "build:backend": "pnpm run --filter @indie-project/backend build",
+    "build:frontend": "pnpm run --filter @indie-project/frontend build",
+    "test": "pnpm run --parallel test",
+    "test:backend": "pnpm run --filter @indie-project/backend test",
+    "test:frontend": "pnpm run --filter @indie-project/frontend test",
+    "lint": "pnpm run --parallel lint",
+    "lint:fix": "pnpm run --parallel lint:fix",
+    "clean": "pnpm run --parallel clean"
+  },
+  "keywords": [
+    "monorepo",
+    "nestjs",
+    "vue",
+    "tailwind",
+    "stripe",
+    "pnpm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=7.0.0"
+  },
+  "packageManager": "pnpm@8.6.0"
+} 
