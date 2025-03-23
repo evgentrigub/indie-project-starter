@@ -150,7 +150,7 @@ const createCheckoutSession = async () => {
   try {
     const response = await apiService.post('/billing/create-checkout-session');
     // Redirect to Stripe Checkout
-    window.location.href = response.data.checkoutUrl;
+    window.location.href = response.data.url;
   } catch (err: any) {
     error.value = err.response?.data?.message || 'Failed to create checkout session';
     processingAction.value = false;

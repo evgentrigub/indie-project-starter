@@ -1,55 +1,49 @@
-import {
-  Controller,
-  Post,
-  UseGuards,
-  Request,
-  Body,
-  Headers,
-  RawBodyRequest,
-  Req,
-  BadRequestException,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Get, Req, Res, Body, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
+import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';
 import { BillingService } from './billing.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ConfigService } from '@nestjs/config';
 
-@ApiTags('billing')
 @Controller('billing')
 export class BillingController {
-  constructor(private readonly billingService: BillingService) {}
+  constructor(
+    private billingService: BillingService,
+    private configService: ConfigService,
+  ) {}
 
-  @Post('create-checkout-session')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a Stripe Checkout Session for subscription' })
-  @ApiResponse({ status: 200, description: 'Checkout session created' })
-  @ApiResponse({ status: 400, description: 'User already has an active subscription' })
-  async createCheckoutSession(@Request() req) {
-    return this.billingService.createCheckoutSession(req.user.id);
+  @Post('create-checkout-session')
+  async createCheckoutSession(@Req() req) {
+    const session = await this.billingService.createCheckoutSession(req.user.id);
+    return { url: session.url };
   }
 
-  @Post('cancel-subscription')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Cancel the current subscription' })
-  @ApiResponse({ status: 200, description: 'Subscription cancelled' })
-  @ApiResponse({ status: 400, description: 'User does not have an active subscription' })
-  async cancelSubscription(@Request() req) {
-    return this.billingService.cancelSubscription(req.user.id);
+  @Post('create-billing-portal-session')
+  async createBillingPortalSession(@Req() req) {
+    const session = await this.billingService.createBillingPortalSession(req.user.id);
+    return { url: session.url };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('cancel-subscription')
+  async cancelSubscription(@Req() req) {
+    const subscription = await this.billingService.cancelSubscription(req.user.id);
+    return { subscription };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('subscription-status')
+  async getSubscriptionStatus(@Req() req) {
+    return this.billingService.getSubscriptionStatus(req.user.id);
   }
 
   @Post('webhook')
-  @ApiOperation({ summary: 'Handle Stripe webhook events' })
-  @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid signature' })
-  async webhook(
-    @Headers('stripe-signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
-  ) {
-    if (!signature) {
-      throw new BadRequestException('Missing stripe-signature header');
-    }
-
-    return this.billingService.handleWebhook(signature, req.rawBody);
+  async webhook(@Body() body, @Req() req, @Res() res: Response) {
+    // Implement webhook handling here
+    // This would handle events like payment_succeeded, payment_failed, etc.
+    // We'd typically update the user's subscription status in our database
+    
+    res.status(200).send({ received: true });
   }
 } 

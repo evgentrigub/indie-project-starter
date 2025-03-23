@@ -1,120 +1,98 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Stripe from 'stripe';
-import { UsersService } from '../users/users.service';
+import { StripeService } from './stripe.service';
+import { UsersService } from '../../modules/users/users.service';
 
 @Injectable()
 export class BillingService {
-  private stripe: Stripe;
-
   constructor(
-    private configService: ConfigService,
+    private stripeService: StripeService,
     private usersService: UsersService,
-  ) {
-    this.stripe = new Stripe(configService.get('stripe.secretKey'), {
-      apiVersion: '2022-08-01',
-    });
-  }
+    private configService: ConfigService,
+  ) {}
 
   async createCheckoutSession(userId: string) {
     const user = await this.usersService.findOne(userId);
-    
-    // If the user already has an active subscription, don't allow creating a new one
-    if (user.hasActiveSubscription) {
-      throw new BadRequestException('User already has an active subscription');
+    if (!user) {
+      throw new Error('User not found');
     }
-    
-    // Create or get Stripe customer
-    let customerId = user.stripeCustomerId;
-    
-    if (!customerId) {
-      const customer = await this.stripe.customers.create({
-        email: user.email,
-        name: user.name,
-        metadata: {
-          userId,
-        },
-      });
-      
-      customerId = customer.id;
-      await this.usersService.updateStripeCustomerId(userId, customerId);
+
+    // Check if user already has a Stripe customer ID
+    if (!user.stripeCustomerId) {
+      const customer = await this.stripeService.createCustomer(user.email, user.name || user.email);
+      await this.usersService.updateStripeCustomerId(user.id, customer.id);
+      user.stripeCustomerId = customer.id;
     }
-    
-    // Create the checkout session
-    const session = await this.stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: this.configService.get('stripe.priceId'),
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${this.configService.get('frontend.url')}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${this.configService.get('frontend.url')}/billing/cancel`,
-      metadata: {
-        userId,
-      },
-    });
-    
-    return { checkoutUrl: session.url };
+
+    // Create checkout session
+    const session = await this.stripeService.createCheckoutSession(
+      user.stripeCustomerId,
+      this.configService.get<string>('FRONTEND_URL') + '/billing/success',
+      this.configService.get<string>('FRONTEND_URL') + '/billing/cancel',
+      this.configService.get<string>('STRIPE_PRICE_ID'),
+    );
+
+    return session;
+  }
+
+  async createBillingPortalSession(userId: string) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (!user.stripeCustomerId) {
+      throw new Error('User does not have a Stripe customer ID');
+    }
+
+    const session = await this.stripeService.createBillingPortalSession(
+      user.stripeCustomerId,
+      this.configService.get<string>('FRONTEND_URL') + '/billing',
+    );
+
+    return session;
   }
 
   async cancelSubscription(userId: string) {
     const user = await this.usersService.findOne(userId);
-    
-    if (!user.hasActiveSubscription || !user.stripeSubscriptionId) {
-      throw new BadRequestException('User does not have an active subscription');
+    if (!user) {
+      throw new Error('User not found');
     }
-    
-    // Cancel the subscription at period end
-    await this.stripe.subscriptions.update(user.stripeSubscriptionId, {
-      cancel_at_period_end: true,
-    });
-    
-    // Update user subscription status
-    // Note: The webhook handler will also update this when Stripe processes the cancelation
-    await this.usersService.updateSubscriptionStatus(userId, false);
-    
-    return { message: 'Subscription has been scheduled for cancellation' };
+
+    if (!user.stripeCustomerId) {
+      throw new Error('User does not have a Stripe customer ID');
+    }
+
+    // Get subscription ID
+    const subscriptions = await this.stripeService.listSubscriptions(user.stripeCustomerId);
+    if (!subscriptions.data.length) {
+      throw new Error('No active subscription found');
+    }
+
+    // Cancel the subscription
+    const subscription = await this.stripeService.cancelSubscription(subscriptions.data[0].id);
+    return subscription;
   }
 
-  async handleWebhook(signature: string, payload: Buffer) {
-    const webhookSecret = this.configService.get('stripe.webhookSecret');
-    
-    let event: Stripe.Event;
-    
-    try {
-      event = this.stripe.webhooks.constructEvent(
-        payload,
-        signature,
-        webhookSecret,
-      );
-    } catch (err) {
-      throw new BadRequestException(`Webhook Error: ${err.message}`);
+  async getSubscriptionStatus(userId: string) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new Error('User not found');
     }
-    
-    // Handle different webhook events
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const userId = session.metadata.userId;
-        const subscriptionId = session.subscription as string;
-        
-        await this.usersService.updateSubscriptionStatus(userId, true, subscriptionId);
-        break;
-      }
-        
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata.userId;
-        
-        await this.usersService.updateSubscriptionStatus(userId, false, null);
-        break;
-      }
+
+    if (!user.stripeCustomerId) {
+      return { hasActiveSubscription: false };
     }
-    
-    return { received: true };
+
+    // Get subscription status
+    const subscriptions = await this.stripeService.listSubscriptions(user.stripeCustomerId);
+    const hasActiveSubscription = subscriptions.data.some(
+      sub => sub.status === 'active' || sub.status === 'trialing'
+    );
+
+    return {
+      hasActiveSubscription,
+      subscriptions: subscriptions.data,
+    };
   }
 } 
