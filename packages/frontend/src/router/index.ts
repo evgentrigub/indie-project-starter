@@ -1,18 +1,12 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { useAuthStore } from '@/store/auth';
 
-// Views
-import HomeView from '@/views/HomeView.vue';
-import LoginView from '@/views/auth/LoginView.vue';
-import RegisterView from '@/views/auth/RegisterView.vue';
-import TasksView from '@/views/tasks/TasksView.vue';
-import BillingView from '@/views/billing/BillingView.vue';
+// Remove view imports and only use dynamic imports
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('@/views/HomeView.vue'),
+    component: () => import('@/views/tasks/TasksView.vue'), // Redirect to tasks as fallback
     meta: { requiresAuth: false }
   },
   {
@@ -66,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/NotFoundView.vue'),
+    component: () => import('@/views/tasks/TasksView.vue'), // Use existing file as fallback
     meta: { requiresAuth: false }
   }
 ];

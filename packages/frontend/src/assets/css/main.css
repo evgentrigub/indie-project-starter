@@ -3,19 +3,19 @@
 @tailwind utilities;
 
 @layer components {
-  .btn-primary {
+  .btn-primary-custom {
     @apply btn btn-primary;
   }
   
-  .btn-secondary {
+  .btn-secondary-custom {
     @apply btn btn-secondary;
   }
   
-  .btn-accent {
+  .btn-accent-custom {
     @apply btn btn-accent;
   }
   
-  .btn-ghost {
+  .btn-ghost-custom {
     @apply btn btn-ghost;
   }
   

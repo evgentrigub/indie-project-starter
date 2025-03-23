@@ -72,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import { PropType } from 'vue';
 import { useTasksStore, Task } from '@/store/tasks';
 
 const props = defineProps({
@@ -84,7 +85,7 @@ const props = defineProps({
     default: false,
   },
   error: {
-    type: String,
+    type: [String, null] as PropType<string | null>,
     default: '',
   },
 });
