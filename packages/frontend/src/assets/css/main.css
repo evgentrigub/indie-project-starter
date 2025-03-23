@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply btn btn-primary;
+  }
+  
+  .btn-secondary {
+    @apply btn btn-secondary;
+  }
+  
+  .btn-accent {
+    @apply btn btn-accent;
+  }
+  
+  .btn-ghost {
+    @apply btn btn-ghost;
+  }
+  
+  .container-custom {
+    @apply container mx-auto px-4 py-6;
+  }
+  
+  .card-custom {
+    @apply card bg-base-100 shadow-xl;
+  }
+  
+  .form-control-custom {
+    @apply form-control w-full max-w-md;
+  }
+  
+  .input-custom {
+    @apply input input-bordered w-full;
+  }
+} 
