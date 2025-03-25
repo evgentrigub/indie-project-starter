@@ -56,6 +56,7 @@ class EnvironmentVariables {
   GOOGLE_CALLBACK_URL: string;
 
   @IsString()
+  @IsOptional()
   STRIPE_SECRET_KEY: string;
 
   @IsString()
@@ -63,6 +64,7 @@ class EnvironmentVariables {
   STRIPE_WEBHOOK_SECRET: string;
 
   @IsString()
+  @IsOptional()
   STRIPE_PRICE_ID: string;
 
   @IsString()

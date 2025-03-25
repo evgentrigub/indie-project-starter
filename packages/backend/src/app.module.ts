@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TasksModule } from './modules/tasks/tasks.module';
-import { BillingModule } from './modules/billing/billing.module';
+// import { BillingModule } from './modules/billing/billing.module';
 import configuration from './config/configuration';
 import { validate } from './config/env.validation';
 
@@ -38,7 +38,7 @@ import { validate } from './config/env.validation';
     UsersModule,
     AuthModule,
     TasksModule,
-    BillingModule,
+    // BillingModule,
   ],
 })
 export class AppModule {} 

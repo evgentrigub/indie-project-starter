@@ -40,6 +40,7 @@ export class AuthService {
     return this.generateTokenResponse(user);
   }
 
+  /* Google auth methods commented out for initial setup
   async validateOAuthUser(email: string, name: string, provider: AuthProvider): Promise<User> {
     let user = await this.usersService.findByEmail(email);
     
@@ -70,6 +71,7 @@ export class AuthService {
     
     return this.generateTokenResponse(dbUser);
   }
+  */
 
   private generateTokenResponse(user: User) {
     const payload = { email: user.email, sub: user.id };
