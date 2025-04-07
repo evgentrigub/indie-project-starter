@@ -13,24 +13,7 @@
           <span>{{ authStore.error }}</span>
         </div>
         
-        <form v-else @submit.prevent="handleSubmit">
-          <div class="form-control mb-4">
-            <label class="label" for="name">
-              <span class="label-text">Name</span>
-            </label>
-            <input 
-              id="name"
-              v-model="userData.name" 
-              type="text" 
-              placeholder="Enter your name" 
-              class="input input-bordered" 
-              :class="{ 'input-error': errors.name }"
-            />
-            <label v-if="errors.name" class="label">
-              <span class="label-text-alt text-error">{{ errors.name }}</span>
-            </label>
-          </div>
-          
+        <div v-else>
           <div class="form-control mb-4">
             <label class="label" for="email">
               <span class="label-text">Email</span>
@@ -64,18 +47,7 @@
               Manage Subscription
             </router-link>
           </div>
-          
-          <div class="form-control mt-6">
-            <button 
-              type="submit" 
-              class="btn btn-primary" 
-              :disabled="isSubmitting"
-            >
-              <span v-if="isSubmitting" class="loading loading-spinner loading-xs mr-2"></span>
-              Update Profile
-            </button>
-          </div>
-        </form>
+        </div>
         
         <div class="divider mt-8 mb-4"></div>
         
@@ -95,48 +67,20 @@ import { ref, reactive, onMounted } from 'vue';
 import { useAuthStore } from '@/store/auth';
 
 const authStore = useAuthStore();
-const isSubmitting = ref(false);
 
 const userData = reactive({
   id: '',
-  name: '',
   email: '',
   hasActiveSubscription: false
-});
-
-const errors = reactive({
-  name: '',
 });
 
 onMounted(async () => {
   if (authStore.user) {
     userData.id = authStore.user.id;
-    userData.name = authStore.user.name || '';
     userData.email = authStore.user.email;
     userData.hasActiveSubscription = authStore.user.hasActiveSubscription;
   }
 });
-
-const validateForm = () => {
-  let isValid = true;
-  errors.name = '';
-  
-  return isValid;
-};
-
-const handleSubmit = async () => {
-  if (!validateForm()) return;
-  
-  isSubmitting.value = true;
-  
-  try {
-    await authStore.updateProfile({
-      name: userData.name
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
-};
 
 const logout = () => {
   authStore.logout();

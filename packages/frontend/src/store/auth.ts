@@ -6,7 +6,6 @@ import router from '@/router';
 export interface User {
   id: string;
   email: string;
-  name: string | null;
   hasActiveSubscription: boolean;
 }
 
@@ -61,12 +60,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
-  const signup = async (email: string, password: string, name?: string) => {
+  const signup = async (email: string, password: string) => {
     isLoading.value = true;
     error.value = null;
     
     try {
-      const response = await apiService.post('/auth/register', { email, password, name });
+      const response = await apiService.post('/auth/register', { email, password });
       const { accessToken, user: userData } = response.data;
       
       token.value = accessToken;

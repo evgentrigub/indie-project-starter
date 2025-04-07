@@ -33,7 +33,7 @@
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                   <div class="w-10 rounded-full bg-primary text-primary-content grid place-items-center">
-                    <span>{{ userInitials }}</span>
+                    <span>{{ getInitials() }}</span>
                   </div>
                 </label>
                 <ul tabindex="0" class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
@@ -75,18 +75,13 @@ const authStore = useAuthStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const user = computed(() => authStore.user);
 
-const userInitials = computed(() => {
-  if (!user.value || !user.value.name) {
-    return user.value?.email.substring(0, 1).toUpperCase() || 'U';
+const getInitials = () => {
+  if (!user.value) {
+    return '?';
   }
-  
-  const names = user.value.name.split(' ');
-  if (names.length > 1) {
-    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
-  }
-  
-  return names[0].charAt(0).toUpperCase();
-});
+  const email = user.value.email;
+  return email.charAt(0).toUpperCase();
+};
 
 const theme = ref(localStorage.getItem('theme') || 'light');
 

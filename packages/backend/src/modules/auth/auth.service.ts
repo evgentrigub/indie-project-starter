@@ -41,14 +41,13 @@ export class AuthService {
   }
 
   /* Google auth methods commented out for initial setup
-  async validateOAuthUser(email: string, name: string, provider: AuthProvider): Promise<User> {
+  async validateOAuthUser(email: string, provider: AuthProvider): Promise<User> {
     let user = await this.usersService.findByEmail(email);
     
     if (!user) {
       // Create new user if not exists
       user = await this.usersService.create({
         email,
-        name,
         provider,
         // For OAuth users, we don't need a password
         password: Math.random().toString(36).slice(-8),
@@ -65,7 +64,6 @@ export class AuthService {
     
     const dbUser = await this.validateOAuthUser(
       user.email,
-      user.name,
       AuthProvider.GOOGLE,
     );
     
@@ -81,7 +79,6 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
         hasActiveSubscription: user.hasActiveSubscription,
       },
     };

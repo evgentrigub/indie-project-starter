@@ -19,7 +19,7 @@ export class BillingService {
 
     // Check if user already has a Stripe customer ID
     if (!user.stripeCustomerId) {
-      const customer = await this.stripeService.createCustomer(user.email, user.name || user.email);
+      const customer = await this.stripeService.createCustomer(user.email);
       await this.usersService.updateStripeCustomerId(user.id, customer.id);
       user.stripeCustomerId = customer.id;
     }

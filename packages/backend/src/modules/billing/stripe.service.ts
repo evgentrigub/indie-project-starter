@@ -15,9 +15,8 @@ export class StripeService {
   /**
    * Create a new Stripe customer
    */
-  async createCustomer(name: string, email: string): Promise<Stripe.Customer> {
+  async createCustomer(email: string): Promise<Stripe.Customer> {
     return this.stripe.customers.create({
-      name,
       email,
     });
   }

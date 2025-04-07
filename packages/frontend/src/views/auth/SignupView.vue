@@ -11,23 +11,6 @@
         
         <form @submit.prevent="handleSubmit">
           <div class="form-control mb-4">
-            <label class="label" for="name">
-              <span class="label-text">Name</span>
-            </label>
-            <input 
-              id="name"
-              v-model="name" 
-              type="text" 
-              placeholder="Enter your name" 
-              class="input input-bordered" 
-              :class="{ 'input-error': errors.name }"
-            />
-            <label v-if="errors.name" class="label">
-              <span class="label-text-alt text-error">{{ errors.name }}</span>
-            </label>
-          </div>
-          
-          <div class="form-control mb-4">
             <label class="label" for="email">
               <span class="label-text">Email</span>
             </label>
@@ -106,18 +89,15 @@ import { useAuthStore } from '@/store/auth';
 
 const authStore = useAuthStore();
 
-const name = ref('');
 const email = ref('');
 const password = ref('');
 const errors = reactive({
-  name: '',
   email: '',
   password: '',
 });
 
 const validateForm = () => {
   let isValid = true;
-  errors.name = '';
   errors.email = '';
   errors.password = '';
   
@@ -137,7 +117,7 @@ const validateForm = () => {
 const handleSubmit = async () => {
   if (!validateForm()) return;
   
-  await authStore.signup(email.value, password.value, name.value);
+  await authStore.signup(email.value, password.value);
 };
 
 const handleGoogleLogin = () => {

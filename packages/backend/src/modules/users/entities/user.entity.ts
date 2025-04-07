@@ -19,13 +19,6 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({
-    example: 'John Doe',
-    description: 'The name of the user',
-  })
-  @Column({ nullable: true })
-  name: string;
-
   @Exclude()
   @Column({ nullable: true })
   password: string;
