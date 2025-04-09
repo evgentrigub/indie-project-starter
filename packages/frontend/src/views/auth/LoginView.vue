@@ -14,12 +14,11 @@
             <label class="label" for="email">
               <span class="label-text">Email</span>
             </label>
-            <input 
+            <TextInput 
               id="email"
               v-model="email" 
               type="email" 
               placeholder="Enter your email" 
-              class="input input-bordered" 
               :class="{ 'input-error': errors.email }"
               required
             />
@@ -32,12 +31,11 @@
             <label class="label" for="password">
               <span class="label-text">Password</span>
             </label>
-            <input 
+            <TextInput 
               id="password"
               v-model="password" 
               type="password" 
               placeholder="Enter your password" 
-              class="input input-bordered" 
               :class="{ 'input-error': errors.password }"
               required
             />
@@ -86,6 +84,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { useAuthStore } from '@/store/auth';
+import TextInput from '@/components/common/TextInput.vue';
 
 const authStore = useAuthStore();
 

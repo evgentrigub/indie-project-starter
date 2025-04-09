@@ -11,28 +11,32 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 
-onMounted(async () => {
+onMounted(() => {
   // Extract token from URL
   const token = route.query.token as string;
   
   if (token) {
-    try {
-      // Process the auth callback
-      await authStore.handleAuthCallback(token);
-    } catch (error) {
-      console.error('Authentication error:', error);
-      // Redirect to login on error
-      window.location.href = '/login';
-    }
+    // Add a slight delay to avoid FrameIsBrowserFrameError
+    setTimeout(async () => {
+      try {
+        // Process the auth callback
+        await authStore.handleAuthCallback(token);
+      } catch (error) {
+        console.error('Authentication error:', error);
+        // Redirect to login on error
+        router.push('/login');
+      }
+    }, 100);
   } else {
     // No token found, redirect to login
-    window.location.href = '/login';
+    router.push('/login');
   }
 });
 </script> 
