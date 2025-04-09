@@ -8,7 +8,7 @@ export class StripeService {
 
   constructor(private configService: ConfigService) {
     this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY'), {
-      apiVersion: '2022-08-01', // Use a compatible API version
+      apiVersion: '2025-02-24.acacia',
     });
   }
 
@@ -95,5 +95,53 @@ export class StripeService {
       signature,
       webhookSecret,
     );
+  }
+
+  /**
+   * Get a subscription by ID
+   */
+  async getSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
+    return this.stripe.subscriptions.retrieve(subscriptionId);
+  }
+
+  /**
+   * Update a subscription's payment method
+   */
+  async updateSubscriptionPaymentMethod(
+    subscriptionId: string,
+    paymentMethodId: string,
+  ): Promise<Stripe.Subscription> {
+    return this.stripe.subscriptions.update(subscriptionId, {
+      default_payment_method: paymentMethodId,
+    });
+  }
+
+  /**
+   * List a customer's payment methods
+   */
+  async listPaymentMethods(customerId: string): Promise<Stripe.ApiList<Stripe.PaymentMethod>> {
+    return this.stripe.paymentMethods.list({
+      customer: customerId,
+      type: 'card',
+    });
+  }
+
+  /**
+   * Attach a payment method to a customer
+   */
+  async attachPaymentMethod(
+    paymentMethodId: string,
+    customerId: string,
+  ): Promise<Stripe.PaymentMethod> {
+    return this.stripe.paymentMethods.attach(paymentMethodId, {
+      customer: customerId,
+    });
+  }
+
+  /**
+   * Detach a payment method from a customer
+   */
+  async detachPaymentMethod(paymentMethodId: string): Promise<Stripe.PaymentMethod> {
+    return this.stripe.paymentMethods.detach(paymentMethodId);
   }
 } 

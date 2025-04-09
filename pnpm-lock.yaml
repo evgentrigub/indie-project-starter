@@ -71,8 +71,8 @@ importers:
         specifier: ^7.5.0
         version: 7.5.0
       stripe:
-        specifier: ^10.12.0
-        version: 10.12.0
+        specifier: ^17.7.0
+        version: 17.7.0
       typeorm:
         specifier: ^0.3.10
         version: 0.3.10(pg@8.8.0)(ts-node@10.9.1)
@@ -6523,9 +6523,9 @@ packages:
       acorn: 8.14.1
     dev: true
 
-  /stripe@10.12.0:
-    resolution: {integrity: sha512-4ijMsbTVSy6rzWIkal+/dFGeTXtjqLeZ/oo/jc2jhICbf3Dby0CBTPxAg6ZhBPXQL96TJxI613C/NhhE7LvrWw==}
-    engines: {node: ^8.1 || >=10.*}
+  /stripe@17.7.0:
+    resolution: {integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==}
+    engines: {node: '>=12.*'}
     dependencies:
       '@types/node': 18.7.18
       qs: 6.14.0
