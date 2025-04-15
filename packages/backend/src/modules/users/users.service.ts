@@ -70,4 +70,16 @@ export class UsersService {
     
     return this.update(userId, updateData);
   }
+
+  async findByStripeCustomerId(stripeCustomerId: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ 
+      where: { stripeCustomerId } 
+    });
+    
+    if (!user) {
+      throw new NotFoundException(`User with Stripe customer ID ${stripeCustomerId} not found`);
+    }
+    
+    return user;
+  }
 } 
