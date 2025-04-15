@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { User, AuthProvider } from '../users/entities/user.entity';
@@ -10,8 +9,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
-    private configService: ConfigService,
+    private jwtService: JwtService
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -40,7 +38,6 @@ export class AuthService {
     return this.generateTokenResponse(user);
   }
 
-  /* Google auth methods commented out for initial setup
   async validateOAuthUser(email: string, provider: AuthProvider): Promise<User> {
     let user = await this.usersService.findByEmail(email);
     
@@ -69,7 +66,6 @@ export class AuthService {
     
     return this.generateTokenResponse(dbUser);
   }
-  */
 
   private generateTokenResponse(user: User) {
     const payload = { email: user.email, sub: user.id };

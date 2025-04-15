@@ -47,7 +47,6 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  /* Google auth endpoints commented out for initial setup
   @Get('google')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Google OAuth login' })
@@ -74,5 +73,4 @@ export class AuthController {
       res.redirect(redirectUrl);
     });
   }
-  */
 } 

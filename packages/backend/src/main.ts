@@ -3,7 +3,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-// import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -11,16 +10,10 @@ async function bootstrap() {
     bodyParser: true,
   });
   
-  // Set global prefix for all routes
   app.setGlobalPrefix('api');
-  
-  // Enable CORS
   app.enableCors();
-  
-  // Use Helmet for security headers
   app.use(helmet());
   
-  // Enable validation pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -44,7 +37,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
   
-  // Get port from environment variable or use default
   const port = process.env.PORT || 3001;
   
   await app.listen(port);
