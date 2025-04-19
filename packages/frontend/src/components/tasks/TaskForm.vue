@@ -7,7 +7,7 @@
         <div class="form-control w-full mb-4">
           <label class="label" for="task-name">
             <span class="label-text">Task Name</span>
-            <span class="text-error">*</span>
+            <span class="text-red-500">*</span>
           </label>
           <input 
             id="task-name"
@@ -19,7 +19,7 @@
             required
           />
           <label v-if="errors.name" class="label">
-            <span class="label-text-alt text-error">{{ errors.name }}</span>
+            <span class="text-error">{{ errors.name }}</span>
           </label>
         </div>
         
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { Task } from '@/store/tasks';
 
 const props = defineProps({
@@ -99,29 +99,33 @@ const errors = reactive({
   name: '',
 });
 
-onMounted(() => {
-  if (props.task) {
-    formData.name = props.task.name;
-    formData.description = props.task.description || '';
-    formData.status = props.task.status;
+// Watch for changes in the task prop
+watch(() => props.task, (newTask) => {
+  if (newTask) {
+    formData.name = newTask.name;
+    formData.description = newTask.description || '';
+    formData.status = newTask.status;
+  } else {
+    formData.name = '';
+    formData.description = '';
+    formData.status = 'todo';
   }
-});
-
-const validateForm = () => {
-  let isValid = true;
-  errors.name = '';
-  
-  if (!formData.name.trim()) {
-    errors.name = 'Task name is required';
-    isValid = false;
-  }
-  
-  return isValid;
-};
+}, { immediate: true });
 
 const handleSubmit = () => {
-  if (!validateForm()) return;
+  // Reset errors
+  errors.name = '';
   
-  emit('submit', { ...formData });
+  // Validate form
+  if (!formData.name.trim()) {
+    errors.name = 'Task name is required';
+    return;
+  }
+  
+  emit('submit', {
+    name: formData.name.trim(),
+    description: formData.description.trim(),
+    status: formData.status,
+  });
 };
 </script> 

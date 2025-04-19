@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const baseURL = typeof window !== 'undefined' ? (import.meta.env.VITE_API_URL || '/api') : '/api';
+
 // Create axios instance with default config
 export const apiService = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
