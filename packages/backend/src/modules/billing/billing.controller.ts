@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Req, Res, Body, UseGuards, Headers, RawBodyRequest, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Post, Get, Req, Res, UseGuards, Headers, RawBodyRequest, InternalServerErrorException } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';
 import { BillingService } from './billing.service';
@@ -63,7 +63,7 @@ export class BillingController {
         console.log("🚀 ~ BillingController ~ event.type:", event.type)
         switch (event.type) {
           case 'customer.subscription.created':
-          case 'customer.subscription.updated':
+          case 'customer.subscription.updated': {
             const subscription = event.data.object as Stripe.Subscription;
             console.log(`🚀 ~ BillingController ~ Processing ${event.type} for customer ${subscription.customer}`);
             const user = await this.usersService.findByStripeCustomerId(subscription.customer as string);
@@ -74,8 +74,9 @@ export class BillingController {
             );
             console.log(`🚀 ~ BillingController ~ Successfully updated subscription status for user ${user.id}`);
             break;
+          }
             
-          case 'customer.subscription.deleted':
+          case 'customer.subscription.deleted': {
             const deletedSubscription = event.data.object as Stripe.Subscription;
             console.log(`🚀 ~ BillingController ~ Processing subscription deletion for customer ${deletedSubscription.customer}`);
             const userToDelete = await this.usersService.findByStripeCustomerId(deletedSubscription.customer as string);
@@ -86,8 +87,9 @@ export class BillingController {
             );
             console.log(`🚀 ~ BillingController ~ Successfully marked subscription as inactive for user ${userToDelete.id}`);
             break;
+          }
             
-          case 'invoice.payment_succeeded':
+          case 'invoice.payment_succeeded': {
             const invoice = event.data.object as Stripe.Invoice;
             if (invoice.subscription) {
               console.log(`🚀 ~ BillingController ~ Processing successful payment for customer ${invoice.customer}`);
@@ -102,8 +104,9 @@ export class BillingController {
               console.log('🚀 ~ BillingController ~ Skipping invoice without subscription');
             }
             break;
+          }
             
-          case 'invoice.payment_failed':
+          case 'invoice.payment_failed': {
             const failedInvoice = event.data.object as Stripe.Invoice;
             if (failedInvoice.subscription) {
               console.log(`🚀 ~ BillingController ~ Processing failed payment for customer ${failedInvoice.customer}`);
@@ -118,6 +121,7 @@ export class BillingController {
               console.log('🚀 ~ BillingController ~ Skipping invoice without subscription');
             }
             break;
+          }
             
           default:
             console.log(`🚀 ~ BillingController ~ Unhandled event type: ${event.type}`);
