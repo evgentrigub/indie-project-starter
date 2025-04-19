@@ -6,6 +6,10 @@ const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',
+  // testRegex: 'auth.service.spec.ts$',
+  // testRegex: 'billing.service.spec.ts$',
+  // testRegex: 'tasks.service.spec.ts$',
+  // testRegex: 'users.service.spec.ts$',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },

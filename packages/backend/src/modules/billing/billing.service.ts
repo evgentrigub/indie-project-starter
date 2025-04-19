@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { StripeService } from './stripe.service';
-import { UsersService } from '../../modules/users/users.service';
+import { UsersService } from '../users/users.service';
+import Stripe from 'stripe';
 
 @Injectable()
 export class BillingService {
@@ -35,7 +36,7 @@ export class BillingService {
     return session;
   }
 
-  async createBillingPortalSession(userId: string) {
+  async createBillingPortalSession(userId: string): Promise<Stripe.BillingPortal.Session> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new Error('User not found');
@@ -45,15 +46,15 @@ export class BillingService {
       throw new Error('User does not have a Stripe customer ID');
     }
 
-    const session = await this.stripeService.createBillingPortalSession(
-      user.stripeCustomerId,
-      this.configService.get<string>('FRONTEND_URL') + '/billing',
-    );
-
+    const returnUrl = this.configService.get<string>('FRONTEND_URL') + '/billing';
+    const session = await this.stripeService.createBillingPortalSession(user.stripeCustomerId, returnUrl);
+    if (!session) {
+      throw new Error('Failed to create billing portal session');
+    }
     return session;
   }
 
-  async cancelSubscription(userId: string) {
+  async cancelSubscription(userId: string): Promise<Stripe.Subscription> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new Error('User not found');
@@ -63,18 +64,20 @@ export class BillingService {
       throw new Error('User does not have a Stripe customer ID');
     }
 
-    // Get subscription ID
     const subscriptions = await this.stripeService.listSubscriptions(user.stripeCustomerId);
-    if (!subscriptions.data.length) {
+    if (!subscriptions?.data?.length) {
       throw new Error('No active subscription found');
     }
 
-    // Cancel the subscription
-    const subscription = await this.stripeService.cancelSubscription(subscriptions.data[0].id);
-    return subscription;
+    const activeSubscription = subscriptions.data[0];
+    const canceledSubscription = await this.stripeService.cancelSubscription(activeSubscription.id);
+    if (!canceledSubscription) {
+      throw new Error('Failed to cancel subscription');
+    }
+    return canceledSubscription;
   }
 
-  async getSubscriptionStatus(userId: string) {
+  async getSubscriptionStatus(userId: string): Promise<{ hasActiveSubscription: boolean; subscriptions?: Stripe.Subscription[] }> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new Error('User not found');
@@ -84,8 +87,11 @@ export class BillingService {
       return { hasActiveSubscription: false };
     }
 
-    // Get subscription status
     const subscriptions = await this.stripeService.listSubscriptions(user.stripeCustomerId);
+    if (!subscriptions?.data) {
+      return { hasActiveSubscription: false };
+    }
+
     const hasActiveSubscription = subscriptions.data.some(
       sub => sub.status === 'active' || sub.status === 'trialing'
     );

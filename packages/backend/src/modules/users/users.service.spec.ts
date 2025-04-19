@@ -15,7 +15,7 @@ describe('UsersService', () => {
     email: 'test@example.com',
     password: 'hashedPassword',
     provider: AuthProvider.LOCAL,
-    stripeCustomerId: 'cus_123',
+    stripeCustomerId: 'cus_1234',
     stripeSubscriptionId: 'sub_123',
     hasActiveSubscription: true,
     createdAt: new Date(),
