@@ -8,9 +8,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     async onRequest({ options }) {
       const token = process.client ? localStorage.getItem('token') : null
       if (token) {
-        options.headers = {
+        options.headers = new Headers({
           Authorization: `Bearer ${token}`
-        }
+        })
       }
     },
     onResponseError({ response }) {

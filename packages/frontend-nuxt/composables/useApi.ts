@@ -1,5 +1,3 @@
-import type { AxiosInstance } from 'axios'
-
 export const useApi = () => {
   const config = useRuntimeConfig()
   

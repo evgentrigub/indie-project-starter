@@ -122,6 +122,7 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
+import { useToast } from '~/composables/useToast'
 
 const api = useApi()
 const authStore = useAuthStore()
@@ -150,11 +151,16 @@ const createCheckoutSession = async () => {
   error.value = null
   
   try {
-    const response = await api.post('/billing/create-checkout-session')
+    const response = await api.fetchWithAuth<{ url: string }>('/billing/create-checkout-session', {
+      method: 'POST'
+    })
+    
     // Redirect to Stripe Checkout
-    window.location.href = response.data.url
+    window.location.href = response.url
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'Failed to create checkout session'
+    console.error('Error creating checkout session:', err)
+    error.value = err.data?.message || 'Failed to create checkout session'
+    useToast().error(error.value)
     processingAction.value = false
   }
 }
@@ -164,11 +170,20 @@ const cancelSubscription = async () => {
   error.value = null
   
   try {
-    await api.post('/billing/cancel-subscription')
-    await authStore.fetchUserProfile() // Refresh user data
-    processingAction.value = false
+    await api.fetchWithAuth('/billing/cancel-subscription', {
+      method: 'POST'
+    })
+    
+    // Refresh user profile to update subscription status
+    await authStore.fetchUserProfile()
+    
+    // Show success message
+    useToast().success('Subscription cancelled successfully')
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'Failed to cancel subscription'
+    console.error('Error cancelling subscription:', err)
+    error.value = err.data?.message || 'Failed to cancel subscription'
+    useToast().error(error.value)
+  } finally {
     processingAction.value = false
   }
 }
