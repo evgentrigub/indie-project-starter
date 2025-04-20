@@ -12,7 +12,7 @@ A complete monorepo template for indie hackers who want to focus on building the
 - Stripe subscription integration
 
 ### Frontend
-- Vue 3
+- Vue 3 (Nuxt.js)
 - Tailwind CSS
 - DaisyUI components
 - ESLint

@@ -17,15 +17,7 @@
     "lint:fix": "pnpm run --parallel lint:fix",
     "clean": "pnpm run --parallel clean"
   },
-  "keywords": [
-    "monorepo",
-    "nestjs",
-    "vue",
-    "tailwind",
-    "stripe",
-    "pnpm"
-  ],
-  "author": "",
+  "author": "Eugene Trigubov",
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0",
