@@ -74,6 +74,11 @@ pnpm dev:frontend
 - Backend API: http://localhost:3001
 - Swagger docs: http://localhost:3001/api/docs
 
+6. Run the local Stripe Webhook
+```
+stripe listen --forward-to localhost:3001/api/webhook
+```
+
 ## Features
 
 - User authentication (signup, login, profile management)
