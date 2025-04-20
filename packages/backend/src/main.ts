@@ -11,7 +11,13 @@ async function bootstrap() {
   });
   
   app.setGlobalPrefix('api');
-  app.enableCors();
+  
+  // Enable CORS for all origins
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+  
   app.use(helmet());
   
   app.useGlobalPipes(

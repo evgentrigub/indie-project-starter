@@ -12,7 +12,7 @@ A complete monorepo template for indie hackers who want to focus on building the
 - Stripe subscription integration
 
 ### Frontend
-- Vue 3
+- Vue 3 (Nuxt.js)
 - Tailwind CSS
 - DaisyUI components
 - ESLint
@@ -73,6 +73,11 @@ pnpm dev:frontend
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
 - Swagger docs: http://localhost:3001/api/docs
+
+6. Run the local Stripe Webhook
+```
+stripe listen --forward-to localhost:3001/api/webhook
+```
 
 ## Features
 

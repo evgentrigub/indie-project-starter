@@ -21,7 +21,7 @@ describe('UsersService', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     tasks: [],
-    hashPassword: async () => {},
+    hashPassword: async () => Promise.resolve(),
     validatePassword: async () => true,
   };
 
