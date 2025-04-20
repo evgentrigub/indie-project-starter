@@ -8,9 +8,12 @@
           <span class="loading loading-spinner loading-lg"></span>
         </div>
         <div v-else class="py-4">
-          <button @click="() => navigateTo('/login')" class="btn btn-primary">
+          <Button 
+            @click="() => navigateTo('/login')" 
+            variant="primary"
+          >
             Return to Login
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -20,6 +23,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
+import { useRoute, navigateTo } from 'nuxt/app'
 
 const authStore = useAuthStore()
 const route = useRoute()

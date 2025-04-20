@@ -49,7 +49,7 @@
                 Edit
               </Button>
               <Button
-                variant="secondary"
+                variant="error"
                 size="sm"
                 @click="deleteTask(task.id)"
               >

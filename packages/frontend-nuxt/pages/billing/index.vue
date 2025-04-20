@@ -47,25 +47,25 @@
               </div>
               
               <div class="card-actions justify-end">
-                <button 
+                <Button 
                   v-if="!hasActiveSubscription" 
                   @click="createCheckoutSession" 
-                  class="btn btn-primary" 
+                  variant="primary"
                   :disabled="processingAction"
                 >
                   <span v-if="processingAction" class="loading loading-spinner loading-xs mr-2"></span>
                   Subscribe Now
-                </button>
+                </Button>
                 
-                <button 
+                <Button 
                   v-else 
                   @click="cancelSubscription" 
-                  class="btn btn-outline btn-error" 
+                  variant="outline"
                   :disabled="processingAction"
                 >
                   <span v-if="processingAction" class="loading loading-spinner loading-xs mr-2"></span>
                   Cancel Subscription
-                </button>
+                </Button>
               </div>
             </div>
           </ClientOnly>
