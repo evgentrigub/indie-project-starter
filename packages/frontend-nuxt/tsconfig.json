@@ -4,7 +4,11 @@
   "compilerOptions": {
     "strict": true,
     "skipLibCheck": true,
-    "types": ["@types/node", "@nuxt/types", "pinia"],
+    "types": [
+      "vitest/globals",
+      "@pinia/nuxt",
+      "@nuxt/types"
+    ],
     "paths": {
       "~/*": ["./*"],
       "@/*": ["./*"]

@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useApi } from '~/composables/useApi'
+import { useApi } from '../composables/useApi'
 
 export interface Task {
   id: string
   name: string
-  description: string | null
+  description?: string
   status: 'todo' | 'in_progress' | 'done'
   createdAt: string
   updatedAt: string
@@ -22,11 +22,12 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
     
     try {
-      const response = await api.get('/tasks')
-      tasks.value = response.data
-      return response.data
+      const response = await api.fetchWithAuth<Task[]>('/tasks')
+      tasks.value = response
+      return response
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch tasks'
+      console.error('Error fetching tasks:', err)
+      error.value = err.data?.message || 'Failed to fetch tasks'
       return []
     } finally {
       isLoading.value = false
@@ -42,11 +43,15 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
     
     try {
-      const response = await api.post('/tasks', taskData)
-      tasks.value.unshift(response.data) // Add to the beginning of the array
-      return response.data
+      const response = await api.fetchWithAuth<Task>('/tasks', {
+        method: 'POST',
+        body: taskData
+      })
+      tasks.value.unshift(response)
+      return response
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to create task'
+      console.error('Error creating task:', err)
+      error.value = err.data?.message || 'Failed to create task'
       return null
     } finally {
       isLoading.value = false
@@ -58,17 +63,19 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
     
     try {
-      const response = await api.put(`/tasks/${id}`, taskData)
+      const response = await api.fetchWithAuth<Task>(`/tasks/${id}`, {
+        method: 'PUT',
+        body: taskData
+      })
       
-      // Update task in the local state
       const index = tasks.value.findIndex(task => task.id === id)
       if (index !== -1) {
-        tasks.value[index] = response.data
+        tasks.value[index] = response
       }
-      
-      return response.data
+      return response
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to update task'
+      console.error('Error updating task:', err)
+      error.value = err.data?.message || 'Failed to update task'
       return null
     } finally {
       isLoading.value = false
@@ -80,14 +87,15 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
     
     try {
-      await api.delete(`/tasks/${id}`)
+      await api.fetchWithAuth(`/tasks/${id}`, {
+        method: 'DELETE'
+      })
       
-      // Remove task from the local state
       tasks.value = tasks.value.filter(task => task.id !== id)
-      
       return true
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to delete task'
+      console.error('Error deleting task:', err)
+      error.value = err.data?.message || 'Failed to delete task'
       return false
     } finally {
       isLoading.value = false

@@ -22,24 +22,29 @@
             <label class="label">
               <span class="label-text">Subscription Status</span>
             </label>
-            <div class="badge" :class="{
-              'badge-success': authStore.user?.hasActiveSubscription,
-              'badge-error': !authStore.user?.hasActiveSubscription
-            }">
-              {{ authStore.user?.hasActiveSubscription ? 'Active' : 'Inactive' }}
-            </div>
+            <ClientOnly>
+              <div v-if="pending" class="loading loading-spinner loading-sm"></div>
+              <div v-else class="badge" :class="{
+                'badge-success': authStore.user?.hasActiveSubscription,
+                'badge-error': !authStore.user?.hasActiveSubscription
+              }">
+                {{ authStore.user?.hasActiveSubscription ? 'Active' : 'Inactive' }}
+              </div>
+            </ClientOnly>
           </div>
           
           <div class="form-control mt-6">
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              class="w-full"
-              :disabled="authStore.isLoading"
-            >
-              {{ authStore.isLoading ? 'Saving...' : 'Save Changes' }}
-            </Button>
+            <ClientOnly>
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                class="w-full"
+                :disabled="authStore.isLoading || pending"
+              >
+                {{ authStore.isLoading ? 'Saving...' : 'Save Changes' }}
+              </Button>
+            </ClientOnly>
           </div>
         </form>
         
@@ -52,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
@@ -60,15 +65,21 @@ const profileForm = ref({
   email: authStore.user?.email || ''
 })
 
-onMounted(async () => {
-  await authStore.fetchUserProfile()
-  profileForm.value.email = authStore.user?.email || ''
+const { pending } = useAsyncData('profile', async () => {
+  if (process.client) {
+    await authStore.fetchUserProfile()
+    profileForm.value.email = authStore.user?.email || ''
+  }
 })
 
 const handleSubmit = async () => {
-  const success = await authStore.updateProfile(profileForm.value)
-  if (success) {
-    // Show success message
+  try {
+    const success = await authStore.updateProfile(profileForm.value)
+    if (success) {
+      useToast().success('Profile updated successfully')
+    }
+  } catch (error) {
+    useToast().error('Failed to update profile')
   }
 }
 </script> 

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { AxiosInstance } from 'axios'
-import { useApi } from '../composables/useApi'
+import { useNuxtApp } from 'nuxt/app'
 
 export interface User {
   id: string
@@ -9,27 +8,35 @@ export interface User {
   hasActiveSubscription: boolean
 }
 
+export interface LoginResponse {
+  accessToken: string
+  user: User
+}
+
+type ApiFetch = <T>(url: string, options?: any) => Promise<T>
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const token = ref<string | null>(null)
   const isAuthenticated = ref(false)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
-  const api: AxiosInstance = useApi()
+  const { $apiFetch } = useNuxtApp()
+  const apiFetch = $apiFetch as ApiFetch
 
   const initializeAuth = async () => {
-    if (process.client) {
-      const storedToken = localStorage.getItem('token')
-      if (storedToken) {
-        token.value = storedToken
-        isAuthenticated.value = true
-        
-        try {
-          await fetchUserProfile()
-        } catch (err) {
-          // If unable to fetch user profile, token might be expired
-          logout()
-        }
+    if (!process.client) return
+
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
+      token.value = storedToken
+      isAuthenticated.value = true
+      
+      try {
+        await fetchUserProfile()
+      } catch (err) {
+        // If unable to fetch user profile, token might be expired
+        logout()
       }
     }
   }
@@ -39,8 +46,12 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const response = await api.post('/auth/login', { email, password })
-      const { accessToken, user: userData } = response.data
+      const response = await apiFetch<LoginResponse>('/auth/login', {
+        method: 'POST',
+        body: { email, password }
+      })
+      
+      const { accessToken, user: userData } = response
       
       token.value = accessToken
       user.value = userData
@@ -50,16 +61,11 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('token', accessToken)
       }
       
-      // Set Authorization header for subsequent requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-      
-      const router = useRouter()
-      const redirectPath = router.currentRoute.value.query.redirect as string || '/tasks'
-      router.push(redirectPath)
+      await navigateTo('/tasks')
       
       return true
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Login failed. Please check your credentials.'
+      error.value = err.data?.message || 'Login failed. Please check your credentials.'
       return false
     } finally {
       isLoading.value = false
@@ -71,8 +77,12 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const response = await api.post('/auth/register', { email, password })
-      const { accessToken, user: userData } = response.data
+      const response = await apiFetch<LoginResponse>('/auth/register', {
+        method: 'POST',
+        body: { email, password }
+      })
+      
+      const { accessToken, user: userData } = response
       
       token.value = accessToken
       user.value = userData
@@ -82,15 +92,11 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('token', accessToken)
       }
       
-      // Set Authorization header for subsequent requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-      
-      const router = useRouter()
-      router.push('/tasks')
+      await navigateTo('/tasks')
       
       return true
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Signup failed. Please try again.'
+      error.value = err.data?.message || 'Signup failed. Please try again.'
       return false
     } finally {
       isLoading.value = false
@@ -98,15 +104,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const googleLogin = () => {
-    window.location.href = `${useRuntimeConfig().public.apiUrl}/auth/google`
+    if (!process.client) return
+    const config = useRuntimeConfig()
+    window.location.href = `${config.public.apiUrl}/auth/google`
   }
 
   const handleAuthCallback = async (callbackToken: string) => {
     try {
-      const response = await api.get('/auth/callback', {
-        params: { token: callbackToken }
+      const response = await apiFetch<LoginResponse>('/auth/callback', {
+        method: 'POST',
+        body: { token: callbackToken }
       })
-      const { accessToken, user: userData } = response.data
+      
+      const { accessToken, user: userData } = response
       
       token.value = accessToken
       user.value = userData
@@ -116,22 +126,19 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('token', accessToken)
       }
       
-      // Set Authorization header for subsequent requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-      
-      const router = useRouter()
-      router.push('/tasks')
+      await navigateTo('/tasks')
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Authentication failed'
+      error.value = err.data?.message || 'Authentication failed'
+      await navigateTo('/login')
       throw err
     }
   }
 
   const fetchUserProfile = async () => {
     try {
-      const response = await api.get('/users/profile')
-      user.value = response.data
-      return response.data
+      const response = await apiFetch<User>('/users/profile')
+      user.value = response
+      return response
     } catch (err) {
       throw err
     }
@@ -145,10 +152,8 @@ export const useAuthStore = defineStore('auth', () => {
     if (process.client) {
       localStorage.removeItem('token')
     }
-    delete api.defaults.headers.common['Authorization']
     
-    const router = useRouter()
-    router.push('/login')
+    navigateTo('/login')
   }
 
   const updateProfile = async (userData: Partial<User>) => {
@@ -156,11 +161,14 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const response = await api.put(`/users/${user.value?.id}`, userData)
-      user.value = response.data
+      const response = await apiFetch<User>(`/users/${user.value?.id}`, {
+        method: 'PUT',
+        body: userData
+      })
+      user.value = response
       return true
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to update profile.'
+      error.value = err.data?.message || 'Failed to update profile.'
       return false
     } finally {
       isLoading.value = false

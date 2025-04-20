@@ -1,19 +1,29 @@
-import axios from 'axios'
+import { useAuthStore } from '~/stores/auth'
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
-  const baseURL = typeof window !== 'undefined' ? (config.public.apiUrl || '/api') : '/api'
-
-  const apiService = axios.create({
-    baseURL,
-    headers: {
-      'Content-Type': 'application/json',
+  
+  const apiFetch = $fetch.create({
+    baseURL: config.public.apiUrl,
+    async onRequest({ options }) {
+      const token = process.client ? localStorage.getItem('token') : null
+      if (token) {
+        options.headers = {
+          Authorization: `Bearer ${token}`
+        }
+      }
     },
+    onResponseError({ response }) {
+      if (response.status === 401) {
+        const authStore = useAuthStore()
+        authStore.logout()
+      }
+    }
   })
-
+  
   return {
     provide: {
-      api: apiService
+      apiFetch
     }
   }
 }) 

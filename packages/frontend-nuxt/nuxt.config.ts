@@ -10,15 +10,23 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
 
+  typescript: {
+    strict: false,
+    typeCheck: false
+  },
+
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [
+    '~/assets/css/main.css',
+    'vue-toastification/dist/index.css'
+  ],
 
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || '/api',
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3001/api',
     },
   },
 
@@ -32,6 +40,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-04-19',
 
   build: {
-    transpile: ['@headlessui/vue']
+    transpile: ['@headlessui/vue', 'vue-toastification']
+  },
+
+  devServer: {
+    port: 3002,
   }
 })

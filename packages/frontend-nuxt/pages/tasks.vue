@@ -11,38 +11,55 @@
       </Button>
     </div>
 
-    <div v-if="isLoading" class="flex justify-center">
-      <span class="loading loading-spinner loading-lg"></span>
-    </div>
+    <ClientOnly>
+      <div v-if="isLoading" class="flex justify-center">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
 
-    <div v-else-if="error" class="alert alert-error">
-      <span>{{ error }}</span>
-    </div>
+      <div v-else-if="error" class="alert alert-error">
+        <span>{{ error }}</span>
+      </div>
 
-    <div v-else class="grid gap-4">
-      <div v-for="task in tasks" :key="task.id" class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title">{{ task.name }}</h2>
-          <p>{{ task.description }}</p>
-          <div class="card-actions justify-end mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              @click="editTask(task)"
-            >
-              Edit
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              @click="deleteTask(task.id)"
-            >
-              Delete
-            </Button>
+      <div v-else-if="tasks.length === 0" class="text-center py-8">
+        <p class="text-gray-500">No tasks found. Create your first task!</p>
+      </div>
+
+      <div v-else class="grid gap-4">
+        <div v-for="task in tasks" :key="task.id" class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="card-title">{{ task.name }}</h2>
+                <p class="mt-2 text-gray-600">{{ task.description }}</p>
+              </div>
+              <div class="badge" :class="{
+                'badge-primary': task.status === 'todo',
+                'badge-warning': task.status === 'in_progress',
+                'badge-success': task.status === 'done'
+              }">
+                {{ task.status.replace('_', ' ') }}
+              </div>
+            </div>
+            <div class="card-actions justify-end mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                @click="editTask(task)"
+              >
+                Edit
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                @click="deleteTask(task.id)"
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ClientOnly>
 
     <!-- Create/Edit Task Modal -->
     <div v-if="showCreateModal" class="modal modal-open">
@@ -119,6 +136,7 @@ import { ref, onMounted } from 'vue'
 import { useTasksStore } from '~/stores/tasks'
 import type { Task } from '~/stores/tasks'
 import { storeToRefs } from 'pinia'
+import { useToast } from '~/composables/useToast'
 
 const tasksStore = useTasksStore()
 const { tasks, isLoading, error } = storeToRefs(tasksStore)
@@ -131,9 +149,9 @@ const taskForm = ref({
   status: 'todo' as Task['status']
 })
 
-const fetchTasks = async () => {
+onMounted(async () => {
   await tasksStore.fetchTasks()
-}
+})
 
 const editTask = (task: Task) => {
   editingTask.value = task
@@ -147,27 +165,42 @@ const editTask = (task: Task) => {
 
 const deleteTask = async (id: string) => {
   if (confirm('Are you sure you want to delete this task?')) {
-    await tasksStore.deleteTask(id)
+    const success = await tasksStore.deleteTask(id)
+    if (success) {
+      useToast().success('Task deleted successfully')
+    } else {
+      useToast().error('Failed to delete task')
+    }
   }
 }
 
 const handleSubmit = async () => {
-  if (editingTask.value) {
-    await tasksStore.updateTask(editingTask.value.id, taskForm.value)
-  } else {
-    await tasksStore.createTask(taskForm.value)
-  }
-  
-  showCreateModal.value = false
-  editingTask.value = null
-  taskForm.value = {
-    name: '',
-    description: '',
-    status: 'todo'
+  try {
+    if (editingTask.value) {
+      const updated = await tasksStore.updateTask(editingTask.value.id, taskForm.value)
+      if (updated) {
+        useToast().success('Task updated successfully')
+      } else {
+        useToast().error('Failed to update task')
+      }
+    } else {
+      const created = await tasksStore.createTask(taskForm.value)
+      if (created) {
+        useToast().success('Task created successfully')
+      } else {
+        useToast().error('Failed to create task')
+      }
+    }
+    
+    showCreateModal.value = false
+    editingTask.value = null
+    taskForm.value = {
+      name: '',
+      description: '',
+      status: 'todo'
+    }
+  } catch (err) {
+    useToast().error('An error occurred')
   }
 }
-
-onMounted(() => {
-  fetchTasks()
-})
 </script> 
