@@ -156,11 +156,14 @@ const createCheckoutSession = async () => {
     })
     
     // Redirect to Stripe Checkout
-    window.location.href = response.url
+    if (process.client) {
+      window.location.assign(response.url)
+    }
   } catch (err: any) {
     console.error('Error creating checkout session:', err)
-    error.value = err.data?.message || 'Failed to create checkout session'
-    useToast().error(error.value)
+    const errorMessage = err.data?.message || 'Failed to create checkout session'
+    error.value = errorMessage
+    useToast().error(errorMessage)
     processingAction.value = false
   }
 }
@@ -181,8 +184,9 @@ const cancelSubscription = async () => {
     useToast().success('Subscription cancelled successfully')
   } catch (err: any) {
     console.error('Error cancelling subscription:', err)
-    error.value = err.data?.message || 'Failed to cancel subscription'
-    useToast().error(error.value)
+    const errorMessage = err.data?.message || 'Failed to cancel subscription'
+    error.value = errorMessage
+    useToast().error(errorMessage)
   } finally {
     processingAction.value = false
   }

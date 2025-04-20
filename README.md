@@ -76,7 +76,7 @@ pnpm dev:frontend
 
 6. Run the local Stripe Webhook
 ```
-stripe listen --forward-to localhost:3001/api/webhook
+stripe listen --forward-to localhost:3001/api/billing/webhook
 ```
 
 ## Features
