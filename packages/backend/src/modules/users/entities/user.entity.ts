@@ -1,8 +1,8 @@
 import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
-import { BaseEntity } from '@app/common/entities/base.entity';
-import { Task } from '@app/modules/tasks/entities/task.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
+import { Task } from '../../../modules/tasks/entities/task.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum AuthProvider {

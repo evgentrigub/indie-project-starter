@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseEntity } from '@app/common/entities/base.entity';
-import { User } from '@app/modules/users/entities/user.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
+import { User } from '../../../modules/users/entities/user.entity';
 
 export enum TaskStatus {
   TODO = 'todo',
