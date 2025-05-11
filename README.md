@@ -25,7 +25,7 @@ indie-project-starter/
 │   └── todo-app/        # Main application
 ├── packages/
 │   ├── backend/         # NestJS backend
-│   └── frontend/        # Vue 3 frontend
+│   └── frontend/        # Vue3 (Nuxt.js) frontend
 └── pnpm-workspace.yaml  # Workspace configuration
 ```
 
@@ -70,7 +70,7 @@ pnpm dev:frontend
 ```
 
 5. Access the application
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:3002
 - Backend API: http://localhost:3001
 - Swagger docs: http://localhost:3001/api/docs
 
