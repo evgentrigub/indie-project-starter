@@ -111,23 +111,20 @@ export const useAuthStore = defineStore('auth', () => {
 
   const handleAuthCallback = async (callbackToken: string) => {
     try {
-      const response = await apiFetch<LoginResponse>('/auth/callback', {
-        method: 'POST',
-        body: { token: callbackToken }
-      })
-      
-      const { accessToken, user: userData } = response
-      
-      token.value = accessToken
-      user.value = userData
-      isAuthenticated.value = true
-      
+      token.value = callbackToken
       if (process.client) {
-        localStorage.setItem('token', accessToken)
+        localStorage.setItem('token', callbackToken)
       }
-      
+      isAuthenticated.value = true
+      const userData = await fetchUserProfile()
+      user.value = userData
       await navigateTo('/tasks')
     } catch (err: any) {
+      token.value = null
+      isAuthenticated.value = false
+      if (process.client) {
+        localStorage.removeItem('token')
+      }
       error.value = err.data?.message || 'Authentication failed'
       await navigateTo('/login')
       throw err
