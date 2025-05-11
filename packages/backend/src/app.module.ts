@@ -7,8 +7,11 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { BillingModule } from './modules/billing/billing.module';
 import configuration from './config/configuration';
 import { validate } from './config/env.validation';
-
+import { AppController } from './modules/app.controller';
 @Module({
+  controllers: [
+    AppController,
+  ],
   imports: [
     // Configuration
     ConfigModule.forRoot({
