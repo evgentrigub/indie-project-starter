@@ -13,8 +13,8 @@
         <div class="flex items-stretch">
           <ClientOnly>
             <template v-if="!isAuthenticated">
-              <NuxtLink to="/login" class="btn btn-ghost">Login</NuxtLink>
-              <NuxtLink to="/signup" class="btn btn-ghost">Sign Up</NuxtLink>
+              <NuxtLink to="/login" class="btn btn-ghost">Sign in</NuxtLink>
+              <NuxtLink to="/signup" class="btn btn-ghost">Sign up</NuxtLink>
             </template>
 
             <template v-else>

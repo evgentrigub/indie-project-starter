@@ -2,7 +2,7 @@
   <div class="flex justify-center">
     <div class="card w-full max-w-md bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title text-2xl mb-6 justify-center">Login</h2>
+        <h2 class="card-title text-2xl mb-6 justify-center">Sign in</h2>
         
         <div v-if="authStore.error" class="alert alert-error mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -52,7 +52,7 @@
               class="w-full"
             >
               <span v-if="authStore.isLoading" class="loading loading-spinner loading-xs mr-2"></span>
-              Login
+              Sign in
             </Button>
           </div>
         </form>
@@ -64,10 +64,10 @@
           variant="outline"
           class="w-full"
         >
-          <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-          </svg>
-          Login with Google
+          <div class="flex items-center justify-center">
+            <img src="~/assets/icons/google-logo.svg" alt="Google logo" width="18" height="18" />
+            <span class="ml-2">Login with Google</span>
+          </div>
         </Button>
         
         <div class="text-center mt-4">
