@@ -15,7 +15,8 @@
     "test:frontend": "pnpm run --filter @indie-project/frontend test",
     "lint": "pnpm run --parallel lint",
     "lint:fix": "pnpm run --parallel lint:fix",
-    "clean": "pnpm run --parallel clean"
+    "clean": "pnpm run --parallel clean",
+    "vercel-build": "npm run build:backend"
   },
   "author": "Eugene Trigubov",
   "license": "MIT",
