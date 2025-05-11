@@ -36,12 +36,12 @@
     "eslint": "^8.25.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.6.0",
-    "nuxt": "^3.5.0",
+    "nuxt": "^3.10.3",
     "postcss": "^8.4.31",
     "prettier": "^2.7.1",
     "shadcn-nuxt": "^2.1.0",
     "tailwindcss": "^3.3.0",
-    "typescript": "^4.8.4",
+    "typescript": "^5.3.3",
     "vitest": "^0.34.6"
   }
 }

@@ -43,6 +43,16 @@ export default defineNuxtConfig({
     transpile: ['@headlessui/vue', 'vue-toastification']
   },
 
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          format: 'es'
+        }
+      }
+    }
+  },
+
   devServer: {
     port: 3002,
   }
