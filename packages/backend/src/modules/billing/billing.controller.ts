@@ -1,5 +1,5 @@
 import { Controller, Post, Get, Req, Res, UseGuards, Headers, RawBodyRequest, InternalServerErrorException } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Response as ExpressResponse, Request as ExpressRequest } from 'express';
 import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';
 import { BillingService } from './billing.service';
 import { ConfigService } from '@nestjs/config';
@@ -45,9 +45,9 @@ export class BillingController {
 
   @Post('webhook')
   async webhook(
-    @Req() req: RawBodyRequest<Request>,
+    @Req() req: RawBodyRequest<ExpressRequest>,
     @Headers('stripe-signature') signature: string,
-    @Res({ passthrough: false }) res: Response,
+    @Res({ passthrough: false }) res: ExpressResponse,
   ) {
     const rawBody = req.rawBody;
     const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
