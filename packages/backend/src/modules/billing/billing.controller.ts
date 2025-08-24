@@ -47,7 +47,7 @@ export class BillingController {
   async webhook(
     @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string,
-    @Res() res: Response,
+    @Res({ passthrough: false }) res: Response,
   ) {
     const rawBody = req.rawBody;
     const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
@@ -131,19 +131,18 @@ export class BillingController {
         throw new InternalServerErrorException(`Failed to process webhook: ${error.message}`);
       }
 
-      res.status(200).send({ received: true });
+      return res.status(200).send({ received: true });
     } catch (err) {
       // Log in catch is still useful, but the one above is more immediate
-      console.log('🚀 ~ BillingController ~ Type of req.body in webhook catch:', typeof req.body, Buffer.isBuffer(req.body)); 
+      console.log('🚀 ~ BillingController ~ Type of req.rawBody in webhook catch:', typeof req.rawBody, Buffer.isBuffer(req.rawBody)); 
       
       if (err instanceof Stripe.errors.StripeSignatureVerificationError) {
         console.error('Webhook signature verification failed:', err.message);
-        res.status(400).send(`Webhook Signature Error: ${err.message}`);
-        return;
+        return res.status(400).send(`Webhook Signature Error: ${err.message}`);
       }
       
       console.error('Webhook error:', err);
-      res.status(400).send(`Webhook Error: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
   }
 } 
