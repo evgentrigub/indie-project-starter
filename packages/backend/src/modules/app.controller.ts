@@ -1,9 +1,16 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Redirect } from "@nestjs/common";
 
 @Controller()
 export class AppController {
   @Get()
-  getHello(): string {
-    return 'Backend is running!';
+  @Redirect('/api/docs', 302)
+  redirectToSwagger1(): void { 
+    return;
+  }
+
+  @Get('api')
+  @Redirect('/api/docs', 302)
+  redirectToSwagger2(): void {
+    return;
   }
 }

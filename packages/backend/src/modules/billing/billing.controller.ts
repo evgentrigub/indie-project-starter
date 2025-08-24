@@ -6,7 +6,9 @@ import { ConfigService } from '@nestjs/config';
 import { StripeService } from './stripe.service';
 import { UsersService } from '../../modules/users/users.service';
 import Stripe from 'stripe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('billing')
 @Controller('billing')
 export class BillingController {
   constructor(

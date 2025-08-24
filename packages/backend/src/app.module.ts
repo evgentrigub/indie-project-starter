@@ -5,6 +5,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { BillingModule } from './modules/billing/billing.module';
+import { HealthModule } from './modules/health/health.module';
 import configuration from './config/configuration';
 import { validate } from './config/env.validation';
 import { AppController } from './modules/app.controller';
@@ -42,6 +43,7 @@ import { AppController } from './modules/app.controller';
     AuthModule,
     TasksModule,
     BillingModule,
+    HealthModule,
   ],
 })
 export class AppModule {} 

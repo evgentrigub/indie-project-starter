@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, RequestMethod } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -10,7 +10,13 @@ async function bootstrap() {
     bodyParser: true,
   });
   
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: [
+      { path: '', method: RequestMethod.GET },
+      { path: 'api', method: RequestMethod.GET },
+      { path: 'health', method: RequestMethod.GET },
+    ],
+  });
   
   // Enable CORS for all origins
   app.enableCors({
@@ -42,8 +48,10 @@ async function bootstrap() {
     
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document, {
-    customfavIcon: 'https://swagger.io/favicon-32x32.png',
-    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css'
+    customSiteTitle: 'Indie Project API',
+    customfavIcon: 'https://petstore.swagger.io/favicon-32x32.png',
+    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    customJs: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js',
   });
   
   const port = process.env.PORT || 3001;
