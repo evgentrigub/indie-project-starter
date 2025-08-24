@@ -41,7 +41,10 @@ async function bootstrap() {
     .build();
     
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    customfavIcon: 'https://swagger.io/favicon-32x32.png',
+    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css'
+  });
   
   const port = process.env.PORT || 3001;
   
